@@ -8,3 +8,6 @@ export const supabase = createClient(url, anonKey)
 
 // Пример (позже):
 // const { data, error } = await supabase.from('games').select('*')
+// debug only
+// @ts-ignore
+window.sb = supabase;
