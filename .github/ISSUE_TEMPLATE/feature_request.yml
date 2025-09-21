@@ -1,0 +1,17 @@
+﻿name: Feature request
+description: Предложить улучшение/фичу
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: Проблема/Ценность
+  - type: textarea
+    attributes:
+      label: Решение/Идея
+  - type: textarea
+    attributes:
+      label: Альтернативы
+  - type: textarea
+    attributes:
+      label: Критерии готовности (acceptance)
