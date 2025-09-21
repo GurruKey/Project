@@ -1,35 +1,31 @@
-﻿import { useEffect, useState } from 'react'
-import { supabase } from '../../shared/api/supabaseClient'
+﻿import { useEffect, useState } from 'react';
+import { supabase } from '../../shared/api/supabaseClient';
 
-export default function Profile(){
-  const [email, setEmail] = useState<string | null>(null)
+export default function Profile() {
+  const [email, setEmail] = useState<string | null>(null);
+  const [uid, setUid]     = useState<string | null>(null);
 
   useEffect(() => {
-    let mounted = true
-    supabase.auth.getUser().then(({ data }) => {
-      if (!mounted) return
-      setEmail(data.user?.email ?? null)
-    })
-    const { data: sub } = supabase.auth.onAuthStateChange(async () => {
-      const { data } = await supabase.auth.getUser()
-      setEmail(data.user?.email ?? null)
-    })
-    return () => { mounted = false; sub.subscription.unsubscribe() }
-  }, [])
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      setUid(data.user?.id ?? null);
+      setEmail(data.user?.email ?? null);
+    })();
+  }, []);
 
-  async function signOut(){ await supabase.auth.signOut() }
+  async function signOut() {
+    await supabase.auth.signOut();
+    location.href = '/auth';
+  }
 
   return (
-    <div style={{padding:24}}>
-      <h1>Profile</h1>
-      {email ? (
-        <>
-          <p>Signed in as <b>{email}</b></p>
-          <button onClick={signOut}>Sign out</button>
-        </>
-      ) : (
-        <p>Not signed in. Перейди на вкладку <code>Auth</code>.</p>
-      )}
+    <div style={{maxWidth:640, margin:'40px auto', padding:20, border:'1px solid #3333', borderRadius:12}}>
+      <h2>Профиль</h2>
+      <div style={{marginTop:8}}>UID: {uid ?? '—'}</div>
+      <div>Email: {email ?? '—'}</div>
+      <div style={{marginTop:12}}>
+        <button onClick={signOut}>Выйти</button>
+      </div>
     </div>
-  )
+  );
 }
