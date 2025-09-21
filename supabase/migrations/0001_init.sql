@@ -26,20 +26,30 @@ for each row execute function public.users_meta_set_updated_at();
 alter table public.users_meta enable row level security;
 
 -- Политики: владелец читает/пишет только свою запись
-drop policy if exists users_meta_owner_select on public.users_meta;
+-- заменить объединённую политику на три раздельные
 drop policy if exists users_meta_owner_modify on public.users_meta;
+drop policy if exists users_meta_owner_insert on public.users_meta;
+drop policy if exists users_meta_owner_update on public.users_meta;
+drop policy if exists users_meta_owner_delete on public.users_meta;
 
-create policy users_meta_owner_select
+create policy users_meta_owner_insert
   on public.users_meta
-  for select
+  for insert
   to authenticated
-  using ( auth.uid() = user_id );
+  with check (auth.uid() = user_id);
 
-create policy users_meta_owner_modify
+create policy users_meta_owner_update
   on public.users_meta
-  for insert, update, delete
+  for update
   to authenticated
-  with check ( auth.uid() = user_id );
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy users_meta_owner_delete
+  on public.users_meta
+  for delete
+  to authenticated
+  using (auth.uid() = user_id);
 
 -- 2) roles/permissions/user_roles — каркас RBAC (управляются сервис-ключом/админом)
 create table if not exists public.roles (

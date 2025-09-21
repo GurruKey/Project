@@ -52,16 +52,34 @@ create policy games_read_public
   on public.games
   for select
   to anon, authenticated
-  using ( is_active = true );
+  using (is_active = true);
 
--- b) Создание/изменение/удаление — только admin/owner
-drop policy if exists games_admin_write on public.games;
-create policy games_admin_write
+-- b) Создание/изменение/удаление — только admin/owner (отдельные политики)
+drop policy if exists games_admin_write on public.games; -- старая объединённая
+drop policy if exists games_admin_insert on public.games;
+drop policy if exists games_admin_update on public.games;
+drop policy if exists games_admin_delete on public.games;
+
+create policy games_admin_insert
   on public.games
-  for insert, update, delete
+  for insert
   to authenticated
-  with check ( public.is_admin_or_owner(auth.uid()) );
+  with check (public.is_admin_or_owner(auth.uid()));
+
+create policy games_admin_update
+  on public.games
+  for update
+  to authenticated
+  using (public.is_admin_or_owner(auth.uid()))    -- кто может трогать существующую строку
+  with check (public.is_admin_or_owner(auth.uid())); -- каким должен быть "новый" ряд
+
+create policy games_admin_delete
+  on public.games
+  for delete
+  to authenticated
+  using (public.is_admin_or_owner(auth.uid()));
 
 -- Индексы
 create index if not exists idx_games_active on public.games(is_active);
-create index if not exists idx_games_slug   on public.games(slug);
+-- уникальный индекс по slug уже существует (из unique-ограничения), второй не создаём
+-- create index if not exists idx_games_slug on public.games(slug);
