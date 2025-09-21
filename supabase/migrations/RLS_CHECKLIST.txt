@@ -1,0 +1,8 @@
+﻿RLS Checklist (каждую таблицу проверять):
+[ ] Включён RLS: ALTER TABLE <name> ENABLE ROW LEVEL SECURITY;
+[ ] Политика чтения (user): <table>.user_id = auth.uid() (где применимо)
+[ ] Политика создания/записи (user): ограничить владельцем
+[ ] Политика admin-read/admin-write: проверка роли (claim/join)
+[ ] Системные операции: отдельная policy под service role
+[ ] Негативные тесты (user к чужим данным)  запрещено
+[ ] Позитивные тесты (user к своим данным)  разрешено
